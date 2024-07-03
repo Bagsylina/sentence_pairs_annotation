@@ -20,7 +20,7 @@ def sentence_pairs(dataset: str, file_path):
         "stream": stream,
         "config": {
             "feed_overlap": True,
-            "buttons": ["accept", "ignore"]
+            "buttons": ["accept"]
         }
     }
 
@@ -34,7 +34,7 @@ def add_choices_to_stream(stream):
         span0 = [{"start": word0, "end": word0 + len(task["word_pair"][0]), "label": "WORD"}]
         span1 = [{"start": word1, "end": word1 + len(task["word_pair"][1]), "label": "WORD"}]
         #taken the word as id, sentence as the text
-        options = [{"id": task["word_pair"][0], "text": task["new_sentence1"][0], "spans": span0}, {"id": task["word_pair"][1], "text": task["new_sentence2"][0], "spans": span1}]
+        options = [{"id": task["word_pair"][0], "text": task["new_sentence1"][0], "spans": span0}, {"id": task["word_pair"][1], "text": task["new_sentence2"][0], "spans": span1}, {"id": "None", "text": "Niciuna"}]
         task["options"] = options
         task["text"] = "Care este cea mai simpla propozitie?"
         task["sentence_id"] = task["id"]
