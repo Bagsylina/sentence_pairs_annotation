@@ -20,7 +20,12 @@ def sentence_pairs(dataset: str, file_path):
         "stream": stream,
         "config": {
             "feed_overlap": True,
-            "buttons": ["accept"]
+            "buttons": ["accept"],
+            "custom_theme": {
+                "labels": {
+                    "": "#ffffff"
+                }
+            }
         }
     }
 
@@ -31,8 +36,8 @@ def add_choices_to_stream(stream):
         #search word in sentence and highlight it
         word0 = task["new_sentence1"][0].find(task["word_pair"][0])
         word1 = task["new_sentence2"][0].find(task["word_pair"][1])
-        span0 = [{"start": word0, "end": word0 + len(task["word_pair"][0]), "label": "WORD"}]
-        span1 = [{"start": word1, "end": word1 + len(task["word_pair"][1]), "label": "WORD"}]
+        span0 = [{"start": word0, "end": word0 + len(task["word_pair"][0]), "label": ""}]
+        span1 = [{"start": word1, "end": word1 + len(task["word_pair"][1]), "label": ""}]
         #taken the word as id, sentence as the text
         options = [{"id": task["word_pair"][0], "text": task["new_sentence1"][0], "spans": span0}, {"id": task["word_pair"][1], "text": task["new_sentence2"][0], "spans": span1}, {"id": "None", "text": "Niciuna"}]
         task["options"] = options
