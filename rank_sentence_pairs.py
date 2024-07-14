@@ -4,7 +4,7 @@ import ranking
 
 #read database from sqllite
 db = connect()
-dataset = db.get_dataset_examples('sentence_simplest_test') #can be changed with any database name
+dataset = db.get_dataset_examples('sentence_fluent_test') #can be changed with any database name
 
 dataframe = pd.DataFrame(dataset) #data is saved as a dataframe
 
