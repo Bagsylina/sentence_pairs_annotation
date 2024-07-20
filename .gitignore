@@ -3,4 +3,3 @@ __pycache__/sentence_pairs_most_fluent.cpython-310.pyc
 __pycache__/sentence_pairs_most_sense.cpython-310.pyc
 __pycache__/sentence_pairs_simplest.cpython-310.pyc
 sentence_fluent_adnot/sentence_fluent_adnot.jsonl
-word_to_sentence.json

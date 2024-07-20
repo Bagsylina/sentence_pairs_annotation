@@ -1,49 +1,32 @@
 from os import listdir
 from os.path import isfile, join, dirname
-from prodigy.components.db import connect
-import pandas as pd
-import statistics
 from itertools import islice
 import json
 import spacy
-
-#read database from sqllite
-db = connect()
-dataset = db.get_dataset_examples('sentence_fluent_test') #can be changed with any database name
-
-dataframe = pd.DataFrame(dataset) #data is saved as a dataframe
 
 #dictionary for sentences containing each word (max 1000 sentences)
 #word set for words with less than 1000 sentences
 word_to_sentence = {}
 word_set = set([])
 
+#tokenizer to get all sentences and words
 nlp = spacy.blank("ro")
 nlp.add_pipe("sentencizer")
 
-#sentence set for no repetitions
-#list with length for each sentence to calculate mean length and standard deviation
-sentence_set = {}
-sentence_lengths = []
+#read word_list.json that contains a python list of words
+with open(join(dirname(__file__), 'word_list.json'), 'r') as f:
+    word_list = json.load(f)
 
-#for each adnotated data get sentence and word
-for i in range(dataframe.shape[0]):
-    if dataframe.loc[i]["original_sentence"] not in sentence_set:
-        token_count = len(nlp(dataframe.loc[i]["original_sentence"]))
-        sentence_set[dataframe.loc[i]["original_sentence"]] = token_count
-        sentence_lengths.append(token_count)
-    if dataframe.loc[i]["word_pair"][0] not in word_to_sentence:
-        word_to_sentence[dataframe.loc[i]["word_pair"][0]] = []
-        word_set.add(dataframe.loc[i]["word_pair"][0])
-    if dataframe.loc[i]["word_pair"][1] not in word_to_sentence:
-        word_to_sentence[dataframe.loc[i]["word_pair"][1]] = []
-        word_set.add(dataframe.loc[i]["word_pair"][1])
+for word in word_list:
+    if word not in word_to_sentence:
+        word_to_sentence[word] = []
+        word_set.add(word)
 
 #mean length and standard deviation
-mean_word_count = int(statistics.mean(sentence_lengths))
-stdev_word_count = int(statistics.stdev(sentence_lengths))
-#mean_word_count = 27
-#stdev_word_count = 9
+#mean_word_count = int(statistics.mean(sentence_lengths))
+#stdev_word_count = int(statistics.stdev(sentence_lengths))
+mean_word_count = 27
+stdev_word_count = 9
 #minimum and maximum sentence length wanted 
 min_word_count = mean_word_count - 2 * stdev_word_count
 max_word_count = mean_word_count + 2 * stdev_word_count
