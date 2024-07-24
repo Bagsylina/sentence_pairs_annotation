@@ -3,6 +3,70 @@ from os.path import isfile, join, dirname
 from itertools import islice
 import json
 import spacy
+import re
+
+#mean length and standard deviation
+mean_word_count = 27
+stdev_word_count = 9
+#minimum and maximum sentence length wanted 
+min_word_count = mean_word_count - 2 * stdev_word_count
+max_word_count = mean_word_count + 2 * stdev_word_count
+
+#special characters to be excluded
+excluded_characters = set(['*', '@', '[', ']', '\\', '/', '<', '>', '=', '^', '_', '`', '{', '}', '|', '~'])
+nr_excluded = len(excluded_characters)
+
+#romanian diacritics and punctuation
+romanian_diacritics = set([536, 537, 538, 539, 350, 351, 354, 355, 258, 259, 194, 226, 206, 238, 8220, 8211, 8212, 8221, 8222, 8230, 8217, 770, 807, 806, 774, 171, 187])
+
+#ignore sentence if it checks certain criterias
+def validate_sentence(sentence):
+    #check sentence length based on mean and stdev
+    sentence_token_count = len(sentence)
+    if sentence_token_count < min_word_count or sentence_token_count > max_word_count:
+        return False
+    
+    #get sentence and all its' words in string format
+    sentence_tokens = [str(x) for x in sentence]
+    sent_str = str(sentence)
+
+    #check if sentence contains special characters
+    sentence_chars = set(sent_str)
+    if len(excluded_characters - sentence_chars) < nr_excluded:
+        return False
+    
+    #check if more then 50% of all characters are uppercase
+    nr_upper = sum(1 for c in sent_str if c.isupper())
+    if nr_upper >= len(sent_str) / 2:
+        return False
+    
+    #check if more than 50% of tokens contain digits
+    nr_with_digits = sum(1 for t in sentence_tokens if bool(re.search(r'\d', t)))
+    if nr_with_digits >= sentence_token_count / 2:
+        return False
+    
+    #check if sentence contains more than one token longer than 20 characters
+    nr_long = sum(1 for t in sentence_tokens if len(t) > 20)
+    if nr_long >= 1:
+        return False
+    
+    #check if more than 60% of tokens are capitalized or numbers (are names, trademarks, dates etc.)
+    nr_capital = sum(1 for t in sentence_tokens if t[0].isupper() or t[0].isdigit())
+    if nr_capital >= sentence_token_count * 3 / 5:
+        return False
+    
+    #check if sentence contains non-ascii characters (excluding diacritics and romanian punctuation)
+    nr_non_ascii = sum(1 for c in sent_str if ord(c) > 127 and ord(c) not in romanian_diacritics)
+    if nr_non_ascii >= 1:
+        return False
+    
+    #check if sentence contains more than 4 consecutive punctuation characters
+    charsearch = re.search("[.?!,;:'\u201c\u201d\u201b\u2013\u2014\u2019\u2025]{5,}", sent_str)
+    if bool(charsearch):
+        return False
+    
+    #sentence passes all checks
+    return True
 
 #dictionary for sentences containing each word (max 1000 sentences)
 #word set for words with less than 1000 sentences
@@ -49,9 +113,8 @@ for text_file in text_files:
             texte = [str(x, 'utf-8') for x in n_lines]
             for doc in nlp.pipe(texte):
                 for sentence in list(doc.sents):
-                    sentence_word_count = len(sentence)
-                    #for each sentence check length and then for each word check if it appears in word set
-                    if sentence_word_count >= min_word_count and sentence_word_count <= max_word_count:
+                    #for each sentence check if it's valid and then for each word check if it appears in word set
+                    if validate_sentence(sentence):
                         word_remove = []
                         for token in sentence:
                             word = str(token)
