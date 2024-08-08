@@ -8,7 +8,8 @@ import torch
 import matplotlib.pyplot as plt
 from sklearn.cluster import AgglomerativeClustering
 from scipy.cluster.hierarchy import dendrogram, linkage
-import mpld3
+from sklearn.metrics import silhouette_score
+import plotly.express as px
 
 #list with word and sentence to extract contextual embeddings from
 with open(join(dirname(__file__), 'sentence_to_cluster.json'), 'r') as f:
@@ -55,8 +56,30 @@ dendrogram(linkage_data)
 plt.title("Word: " + word)
 plt.savefig(join(dirname(__file__), 'ward_clustering.png'))
 
+#get number of clusters with best silhouette score or very close to the best score
+kmeans_per_k = [AgglomerativeClustering(n_clusters=k, metric = 'euclidean', linkage ='ward').fit(tsne_embeddings)
+                for k in range(2, 20)]
+silhouette_scores = [silhouette_score(tsne_embeddings, model.labels_)
+                     for model in kmeans_per_k]
+nr_clusters = np.argmax(silhouette_scores)
+nr_best_clusters = nr_clusters
+
+for i in range(nr_clusters + 1, 18):
+    if silhouette_scores[i] > silhouette_scores[nr_clusters] * 0.95:
+        nr_best_clusters = i
+
+nr_best_clusters += 2
+
+#get clusters (preset number of clusters)
+#hc = AgglomerativeClustering(n_clusters = 25, metric = 'euclidean', linkage ='ward')
+#embedding_labels = hc.fit_predict(tsne_embeddings)
+
+#get clusters based on minimum distance at which clusters will not be merged
+#hc_distance = AgglomerativeClustering(n_clusters = None, distance_threshold = 50, metric = 'euclidean', linkage ='ward')
+#embedding_labels = hc_distance.fit_predict(tsne_embeddings)
+
 #get clusters
-hc = AgglomerativeClustering(n_clusters = 25, metric = 'euclidean', linkage ='ward')
+hc = AgglomerativeClustering(n_clusters = nr_best_clusters, metric = 'euclidean', linkage ='ward')
 embedding_labels = hc.fit_predict(tsne_embeddings)
 
 #save data in a json file
@@ -67,22 +90,14 @@ for sent_index in range(1, len(sentence_list)):
 with open(join(dirname(__file__), 'word_embedding_data.json'), 'w') as f:
     json.dump(sentence_dict, f)
 
-#plot points, with color representing cluster
-fig, ax = plt.subplots()
-plt.title("Word: " + word)
-fig.set_size_inches(10, 10)
-
 unzip = [[i for [i, j] in tsne_embeddings],
        [j for [i, j] in tsne_embeddings]]
 
-scatter = ax.scatter(unzip[0], unzip[1], c=embedding_labels)
+#plot in html with sentence and data appearing when hovering
+labels = [sentence_dict[i]["sentence"] for i in range(1, len(sentence_list))]   
 
-#plot in browser with sentence appearing when hovering
-labels = [sentence_dict[i]["sentence"] for i in range(1, len(sentence_list))]
-tooltip = mpld3.plugins.PointLabelTooltip(scatter, labels=labels)
-mpld3.plugins.connect(fig, tooltip)
+fig_px = px.scatter(x=unzip[0], y=unzip[1], color=embedding_labels, hover_name=labels, title="Word: " + word)
 
-mpld3.show()
-
-#save plot as a png
-plt.savefig(join(dirname(__file__), 'word_context_clustering.png'))
+#save plot as html
+fig_px.write_html(join(dirname(__file__), 'word_context_clustering.html'))
+fig_px.show()
