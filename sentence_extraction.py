@@ -83,7 +83,6 @@ with open(join(dirname(__file__), 'word_list.json'), 'r') as f:
 
 for word in word_list:
     if word not in word_to_sentence:
-        word_to_sentence[word] = []
         word_set.add(word)
 
 #mean length and standard deviation
@@ -115,17 +114,33 @@ for text_file in text_files:
                 for sentence in list(doc.sents):
                     #for each sentence check if it's valid and then for each word check if it appears in word set
                     if validate_sentence(sentence):
-                        word_remove = []
+                        #word_remove = []
+
+                        words_in_sent = set([])
+
                         for token in sentence:
                             word = str(token)
                             if word in word_set:
-                                word_to_sentence[word].append(str(sentence))
+                                words_in_sent.add(word)
+                                #word_to_sentence[word].append(str(sentence))
                                 #if word has reached 1000 sentences remove from set to stop adding new sentences
-                                if len(word_to_sentence[word]) == 1000:
-                                    word_remove.append(word)
+                                #if len(word_to_sentence[word]) == 1000:
+                                    #word_remove.append(word)
+                        
+                        #for word in word_remove:
+                            #word_set.remove(word)
+                        
+                        nr_words = len(words_in_sent)
+                        words_in_sent = str(words_in_sent)
 
-                        for word in word_remove:
-                            word_set.remove(word)
+                        if nr_words > 0:
+                            if nr_words not in word_to_sentence:
+                                word_to_sentence[nr_words] = {}
+                            if words_in_sent not in word_to_sentence[nr_words]:
+                                word_to_sentence[nr_words][words_in_sent] = []
+                            if len(word_to_sentence[nr_words][words_in_sent]) < 1000 and str(sentence) not in word_to_sentence[nr_words][words_in_sent]:
+                                word_to_sentence[nr_words][words_in_sent].append(str(sentence))
+
 
 #save data to a json file
 with open(join(dirname(__file__), 'word_to_sentence.json'), 'w') as f:
