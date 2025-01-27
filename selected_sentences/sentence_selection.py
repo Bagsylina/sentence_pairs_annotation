@@ -26,6 +26,16 @@ for i in range(5, 0, -1):
                 else:
                     word_to_selected_sentence[word].append(sentences[i_key][key][0])
 
+with open(join(dirname(__file__), 'selected_words_subsample_data.json'), 'r') as f:
+    subsamples = json.load(f)
+
+for word in words_set:
+    if word in subsamples:
+        new_selected_sentences = []
+        for subsample in subsamples[word]["subsamples"]:
+            new_selected_sentences.append(subsamples[word]["subsamples"][subsample]["close_to_center"][0]["sentence"])
+        word_to_selected_sentence[word] = new_selected_sentences
+
 print(len(selected_sentences))
 print(len(word_to_selected_sentence))
 
