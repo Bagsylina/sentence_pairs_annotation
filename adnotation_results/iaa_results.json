@@ -1,0 +1,11 @@
+{
+  "n_examples": 6731,
+  "n_categories": 1257,
+  "n_coincident_examples": 2878,
+  "n_single_annotation": 2,
+  "n_annotators": 5,
+  "avg_raters_per_example": 2.337152777777778,
+  "percent_agreement": 0.5397961547370851,
+  "kripp_alpha": 0.5292861177739001,
+  "gwet_ac2": 0.5394356372422039
+}
