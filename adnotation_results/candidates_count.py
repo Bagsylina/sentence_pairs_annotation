@@ -2,6 +2,7 @@ import json
 from os import listdir
 from os.path import isfile, join, dirname
 import plotly.express as px
+import pandas as pd
 
 with open(join(dirname(__file__), 'fluency.jsonl'), 'r') as f:
     fluency = [json.loads(line) for line in f]
@@ -10,6 +11,8 @@ with open(join(dirname(__file__), 'simplicity.json'), 'r') as f:
     simplicity = json.load(f)
 
 adnotations = fluency + simplicity
+
+romanian_lcp = pd.read_csv(join(dirname(__file__), 'romanian_lcp.tsv'), sep='\t', header=None)
 
 candidates = {}
 
@@ -20,6 +23,12 @@ for adn in adnotations:
         candidates[id] = set([])
     candidates[id].add(word_pair[0])
     candidates[id].add(word_pair[1])
+
+for i in range(romanian_lcp.shape[0]):
+    id = romanian_lcp.iloc[i, 0]
+    if id not in candidates:
+        candidates[id] = set([])
+    candidates[id].add(romanian_lcp.iloc[i, 3])
 
 cand_count = {}
 
