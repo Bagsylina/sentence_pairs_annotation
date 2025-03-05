@@ -31,15 +31,32 @@ def map_label(label):
             return 5
         case _:
             return 5
+        
+new_ids = {}
+
+data = data1 + data2 + data3 + data4
+for x in data:
+    key = x['text'] + x['meta']['word']
+    if x['id'] < 5000:
+        x['text'] = ' '.join(x['text'].split())
+        x['text'] = x['text'].replace(" ,", ",")
+        x['text'] = x['text'].replace(" .", ".")
+        x['text'] = x['text'].replace(" >.", ".")
+        key = x['text'] + x['meta']['word']
+
+    if key not in new_ids:
+        new_ids[key] = x['id']
+    else:
+        x['id'] = new_ids[key]
 
 for x in data1:
-    taskdata.append(['c1', x['id'], map_label(x['label'][0][2])])
+    taskdata.append(['victor', x['id'], map_label(x['label'][0][2])])
 for x in data2:
-    taskdata.append(['c1', x['id'], map_label(x['label'][0][2])])
+    taskdata.append(['sergiu', x['id'], map_label(x['label'][0][2])])
 for x in data3:
-    taskdata.append(['c2', x['id'], map_label(x['label'][0][2])])
+    taskdata.append(['petru', x['id'], map_label(x['label'][0][2])])
 for x in data4:
-    taskdata.append(['c2', x['id'], map_label(x['label'][0][2])])
+    taskdata.append(['stadio88', x['id'], map_label(x['label'][0][2])])
 
 task = agreement.AnnotationTask(data=taskdata)
 iaa_results = {"n_examples": len(taskdata), "n_categories": 5, "n_annotators": 4, "percent_agreement": task.avg_Ao(), "cohen_kappa": task.kappa(), "kripp_alpha": task.alpha()}

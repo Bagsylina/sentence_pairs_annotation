@@ -1,8 +1,0 @@
-{
-    "n_examples": 2280,
-    "n_categories": 5,
-    "n_annotators": 4,
-    "percent_agreement": 0.49912280701754386,
-    "cohen_kappa": 0.21492337862513308,
-    "kripp_alpha": 0.21183373822498164
-}
