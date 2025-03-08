@@ -34,7 +34,25 @@ def map_label(label):
         
 new_ids = {}
 
-data = data1 + data2 + data3 + data4
+data = []
+
+for x in data1:
+    y = x
+    y["annotator"] = "victor"
+    data.append(y)
+for x in data2:
+    y = x
+    y["annotator"] = "sergiu"
+    data.append(y)
+for x in data3:
+    y = x
+    y["annotator"] = "petru"
+    data.append(y)
+for x in data4:
+    y = x
+    y["annotator"] = "stadio88"
+    data.append(y)
+
 for x in data:
     key = x['text'] + x['meta']['word']
     if x['id'] < 5000:
@@ -73,12 +91,11 @@ for x in data:
     if id not in data_dict:
         data_dict[id] = {'id': id, 'text': x['text'], 'meta': x['meta'], 'labels': [], 'scores': []}
     
-    data_dict[id]['labels'] += x['label']
+    data_dict[id]['labels'].append(x['label'][0] + [x['annotator']])
 
-    for y in x['label']:
-        score_text = y[2]
-        score = (map_label(score_text) - 1) / 4
-        data_dict[id]['scores'].append(score)
+    score_text = x['label'][0][2]
+    score = (map_label(score_text) - 1) / 4
+    data_dict[id]['scores'].append(score)
 
 for id in data_dict:
     data_dict[id]['mean_score'] = np.average(data_dict[id]['scores'])
