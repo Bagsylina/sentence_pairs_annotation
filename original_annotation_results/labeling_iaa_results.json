@@ -1,8 +1,15 @@
 {
-    "n_examples": 2280,
+    "n_examples": 2845,
     "n_categories": 5,
-    "n_annotators": 4,
-    "percent_agreement": 0.5043936731107206,
-    "cohen_kappa": 0.23540986724729498,
-    "kripp_alpha": 0.22051007435660508
+    "n_annotators": 5,
+    "percent_agreement": 0.504,
+    "cohen_kappa": 0.231,
+    "kripp_alpha": 0.211,
+    "correlation_with_zipf": -0.59,
+    "correlation_with_zipf_filtered": -0.36,
+    "counts": {
+        "simple": 512,
+        "complex": 53,
+        "inconclusive": 4
+    }
 }
